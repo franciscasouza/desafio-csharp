@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio C#: Árvores de Decisão e Clean Code</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --dark: #2d2d2d;
+            --light: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .quiz-item {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            background: #fff;
+        }
+        .code-block {
+            background: var(--dark);
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        .options { list-style: none; padding: 0; }
+        .options li {
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .options li:hover { background: #f0f7ff; border-color: var(--primary); }
+        .options li.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        button#btn-submit {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 20px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        #result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+            border: 2px solid #c3e6cb;
+            background: #d4edda;
+            color: #155724;
+        }
+        footer { text-align: center; margin-top: 40px; color: #777; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>💻 Desafio C#: Árvore de Decisão</h1>
+        <p><strong>Profª Francisca</strong> | CEET Vasco Coutinho</p>
+    </div>
+
+    <div class="form-group">
+        <div>
+            <label for="nome">Nome do Aluno:</label>
+            <input type="text" id="nome" placeholder="Nome Completo">
+        </div>
+        <div>
+            <label for="turma">Turma:</label>
+            <input type="text" id="turma" placeholder="Ex: 2º ano TI">
+        </div>
+    </div>
+
+    <div class="quiz-item">
+        <h3>1. Qual o retorno para <code>AvaliarDesempenho(7.5)</code>?</h3>
+        <div class="code-block">
+string AvaliarDesempenho(double nota) {
+    if (nota >= 9) return "Excelente";
+    else if (nota >= 7) return "Bom";
+    else if (nota >= 5) return "Regular";
+    else return "Insuficiente";
+}</div>
+        <ul class="options" data-q="1">
+            <li onclick="sel(this, 1)">Excelente</li>
+            <li onclick="sel(this, 2)">Bom</li>
+            <li onclick="sel(this, 3)">Regular</li>
+            <li onclick="sel(this, 4)">Insuficiente</li>
+        </ul>
+    </div>
+
+    <div class="quiz-item">
+        <h3>2. O que as "Cláusulas de Guarda" (Early Return) evitam?</h3>
+        <ul class="options" data-q="2">
+            <li onclick="sel(this, 1)">O uso de variáveis locais.</li>
+            <li onclick="sel(this, 2)">O "Código Espaguete" (excesso de ifs aninhados).</li>
+            <li onclick="sel(this, 3)">A criação de métodos na classe.</li>
+        </ul>
+    </div>
+
+    <div class="quiz-item">
+        <h3>3. Por que usamos métodos em C#?</h3>
+        <ul class="options" data-q="3">
+            <li onclick="sel(this, 1)">Para reaproveitar a lógica e evitar repetições desnecessárias.</li>
+            <li onclick="sel(this, 2)">Para tornar a execução do programa mais lenta.</li>
+            <li onclick="sel(this, 3)">Porque estruturas de condição não funcionam sozinhas.</li>
+        </ul>
+    </div>
+
+    <button id="btn-submit" onclick="validar()">Finalizar e Enviar para a Planilha</button>
+
+    <div id="result"></div>
+
+    <footer>PPGPE/CE/UFES & CEET Vasco Coutinho - 2026</footer>
+</div>
+
+<script>
+    const res = { 1: null, 2: null, 3: null };
+    // SUBSTITUA ABAIXO PELO SEU URL DO GOOGLE APPS SCRIPT
+    const APP_URL = "https://script.google.com/macros/s/AKfycbyZECoZI8n_lWHLUnMjJR93DCvMLbZSgvHIMLazyVTPvxJrspA6HpJlhp2woKjF8PfzZQ/exec"; 
+
+    function sel(el, v) {
+        const q = el.parentElement.getAttribute('data-q');
+        Array.from(el.parentElement.children).forEach(l => l.classList.remove('selected'));
+        el.classList.add('selected');
+        res[q] = v;
+    }
+
+    async function validar() {
+        const n = document.getElementById('nome').value;
+        const t = document.getElementById('turma').value;
+
+        if(!n || !t || Object.values(res).includes(null)) {
+            alert("⚠️ Preencha o seu nome, turma e todas as questões!"); 
+            return;
+        }
+
+        let pts = 0;
+        if(res[1] === 2) pts++; // Resposta: Bom
+        if(res[2] === 2) pts++; // Resposta: Código Espaguete
+        if(res[3] === 1) pts++; // Resposta: Reaproveitar lógica
+
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerText = "Enviando dados...";
+
+        try {
+            // Envio para o Google Sheets
+            const payload = { nome: n, turma: t, nota: pts };
+            
+            await fetch(APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Necessário para evitar erros de CORS com Apps Script
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const box = document.getElementById('result');
+            box.style.display = 'block';
+            box.innerHTML = `
+                <h2>✅ Atividade Recebida com Sucesso!</h2>
+                <p><strong>Estudante:</strong> ${n} | <strong>Turma:</strong> ${t}</p>
+                <hr>
+                <p style="font-size: 1.4em;">Acertou <strong>${pts} de 3</strong> questões.</p>
+                <p>Os dados foram guardados na folha de cálculo da professora.</p>
+            `;
+            btn.style.display = 'none';
+
+        } catch (error) {
+            alert("Erro ao enviar os dados. Verifique a ligação ou o URL do script.");
+            btn.disabled = false;
+            btn.innerText = "Tentar Reenviar";
+        }
+        
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+</body>
+</html>
